@@ -22,5 +22,19 @@ func main() {
 	cv.SetContent(content)
 	window.Resize(fyne.NewSize(800, 600))
 
+	// keyboard event
+	window.Canvas().SetOnTypedKey(func(e *fyne.KeyEvent) {
+		switch e.Name {
+		case fyne.KeyUp:
+			image.Move(fyne.NewPos(0, -10))
+		case fyne.KeyDown:
+			image.Move(fyne.NewPos(0, 10))
+		case fyne.KeyLeft:
+			image.Move(fyne.NewPos(-10, 0))
+		case fyne.KeyRight:
+			image.Move(fyne.NewPos(10, 0))
+		}
+	})
+
 	window.ShowAndRun()
 }
