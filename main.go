@@ -15,7 +15,7 @@ func main() {
 	cv := window.Canvas()
 
 	bg := canvas.NewRectangle(color.RGBA{0, 0, 0, 255})
-	image := canvas.NewImageFromResource(nil)
+	image := canvas.NewImageFromFile("./assets/blue.png")
 	image.FillMode = canvas.ImageFillOriginal
 
 	content := container.NewMax(bg, image)
