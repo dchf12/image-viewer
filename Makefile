@@ -7,13 +7,13 @@ tidy:
 	@go mod tidy
 
 build:
-	@CGO_ENABLED=1 go build -o $(BINARY_NAME) -v
+	@CGO_ENABLED=1 go build -gcflags="all=-N -l" -o $(BINARY_NAME) -v
 
 run: build
 	@./$(BINARY_NAME)
 
 test: build
-	@go test -v -coverprofile=${COVERAGE_FILE} ./...
+	@go test -race -v -coverprofile=${COVERAGE_FILE} ./...
 
 bench: 
 	@go test -bench=. -benchmem ./...
