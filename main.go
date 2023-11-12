@@ -1,7 +1,8 @@
 package main
 
 import (
-	"image/color"
+	"io/ioutil"
+	"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -12,29 +13,36 @@ import (
 func main() {
 	fapp := app.New()
 	window := fapp.NewWindow("viewer")
-	cv := window.Canvas()
 
-	bg := canvas.NewRectangle(color.RGBA{0, 0, 0, 255})
-	image := canvas.NewImageFromFile("./assets/blue.png")
-	image.FillMode = canvas.ImageFillOriginal
+	images, err := ioutil.ReadDir("./assets")
+	if err != nil {
+		log.Fatal(err)
+	}
+	cImages := make([]*canvas.Image, len(images))
+	for i, image := range images {
+		cImages[i] = canvas.NewImageFromFile("./assets/" + image.Name())
+		cImages[i].FillMode = canvas.ImageFillOriginal
+	}
+	window.SetContent(container.NewVBox(
+		cImages[0],
+	))
 
-	content := container.NewMax(bg, image)
-	cv.SetContent(content)
 	window.Resize(fyne.NewSize(800, 600))
 
-	// keyboard event
-	window.Canvas().SetOnTypedKey(func(e *fyne.KeyEvent) {
-		switch e.Name {
-		case fyne.KeyUp:
-			image.Move(fyne.NewPos(0, -10))
-		case fyne.KeyDown:
-			image.Move(fyne.NewPos(0, 10))
-		case fyne.KeyLeft:
-			image.Move(fyne.NewPos(-10, 0))
-		case fyne.KeyRight:
-			image.Move(fyne.NewPos(10, 0))
-		}
-	})
+	window.Canvas().SetOnTypedKey(handleKeys)
 
 	window.ShowAndRun()
+}
+
+func handleKeys(e *fyne.KeyEvent) {
+	switch e.Name {
+	case fyne.KeyUp:
+		// TODO: move to next image
+	case fyne.KeyDown:
+		// TODO: move to previous image
+	case fyne.KeyLeft:
+		// TODO: move to previous image
+	case fyne.KeyRight:
+		// TODO: move to next image
+	}
 }
