@@ -18,11 +18,31 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cImages := make([]*canvas.Image, len(images))
-	for i, image := range images {
-		cImages[i] = canvas.NewImageFromFile("./assets/" + image.Name())
-		cImages[i].FillMode = canvas.ImageFillOriginal
+
+	// 画像とそのインデックスを保持するための構造体
+	type indexedImage struct {
+		index int
+		image *canvas.Image
 	}
+
+	imageCh := make(chan indexedImage, len(images))
+	for i, image := range images {
+		if image.IsDir() {
+			continue
+		}
+		go func(i int, name string) {
+			cImage := canvas.NewImageFromFile("./assets/" + name)
+			cImage.FillMode = canvas.ImageFillOriginal
+			imageCh <- indexedImage{i, cImage}
+		}(i, image.Name())
+	}
+
+	cImages := make([]*canvas.Image, len(images))
+	for range images {
+		image := <-imageCh
+		cImages[image.index] = image.image
+	}
+
 	window.SetContent(container.NewVBox(
 		cImages[0],
 	))
@@ -34,15 +54,21 @@ func main() {
 	window.ShowAndRun()
 }
 
+var currentImage int
+
 func handleKeys(e *fyne.KeyEvent) {
 	switch e.Name {
 	case fyne.KeyUp:
 		// TODO: move to next image
+		currentImage++
 	case fyne.KeyDown:
 		// TODO: move to previous image
+		currentImage--
 	case fyne.KeyLeft:
 		// TODO: move to previous image
+		currentImage--
 	case fyne.KeyRight:
 		// TODO: move to next image
+		currentImage++
 	}
 }
