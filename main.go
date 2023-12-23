@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 )
 
 const MaxImagesToLoad = 10
@@ -38,6 +39,8 @@ func handleKeys(e *fyne.KeyEvent) {
 		imageManager.Next()
 	case fyne.KeyDown, fyne.KeyLeft:
 		imageManager.Prev()
+	case fyne.KeyO:
+		openDirectory()
 	}
 	updateImage()
 }
@@ -47,4 +50,15 @@ func updateImage() {
 		imageManager.Current(),
 	))
 	window.Canvas().Refresh(window.Content().(*fyne.Container))
+}
+
+func openDirectory() {
+	dialog.ShowFolderOpen(func(uri fyne.ListableURI, err error) {
+		if uri != nil || err != nil {
+			if err := imageManager.Load(uri.Path()); err != nil {
+				log.Fatal(err)
+			}
+			updateImage()
+		}
+	}, window)
 }
